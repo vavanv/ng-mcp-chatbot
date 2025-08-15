@@ -11,7 +11,7 @@ export interface AppConfig {
 })
 export class ConfigService {
   private readonly STORAGE_KEY = 'chatbot-config';
-  private readonly DEFAULT_MCP_URL = 'http://localhost:3100';
+  private readonly DEFAULT_MCP_URL = '/api/mcp';
   
   // Reactive signals for configuration
   private _config = signal<AppConfig>({

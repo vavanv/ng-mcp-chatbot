@@ -111,6 +111,7 @@ export class App implements AfterViewChecked, OnInit {
     this.openaiService.getMCPTools().subscribe({
       next: (mcpTools) => {
         console.log('MCP Tools available:', mcpTools);
+        
         this.mcpHealthStatus.set('Healthy');
         // Use MCP context with OpenAI
         this.openaiService.sendMessageWithMCPContext(this.conversationHistory, mcpTools).subscribe({
