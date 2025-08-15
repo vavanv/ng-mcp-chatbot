@@ -222,14 +222,12 @@ export class App implements AfterViewChecked, OnInit {
 
   checkMCPHealth() {
     const mcpUrl = this.configService.getMcpServerUrl();
-    console.log('Starting MCP initialization for URL:', mcpUrl);
     
     this.mcpHealthStatus.set('Checking...');
     
     this.openaiService.initializeMCP().subscribe({
       next: (response) => {
         this.mcpHealthStatus.set('Healthy');
-        console.log('MCP Initialization Response:', response);
         
         this.messages.update(messages => [
           ...messages,

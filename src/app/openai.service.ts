@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
 
 export interface OpenAIMessage {
@@ -37,12 +37,10 @@ export class OpenAIService {
 
   checkMCPHealth(): Observable<MCPHealthResponse> {
     const mcpServerUrl = this.configService.getMcpServerUrl();
-    console.log('Checking MCP health at:', mcpServerUrl);
 
     // Make a direct GET request to the /health endpoint via proxy
     return this.http.get('/api/mcp/health').pipe(
       map((response: any) => {
-        console.log('MCP Health response:', response);
         return {
           status: response.status === 'ok' ? 'healthy' : 'unhealthy',
           timestamp: new Date().toISOString(),
@@ -142,7 +140,6 @@ export class OpenAIService {
   // Method to interact with MCP server using JSON-RPC
   callMCPMethod(method: string, params?: any): Observable<any> {
     const mcpServerUrl = this.configService.getMcpServerUrl();
-    console.log('Calling MCP method:', method, 'via proxy');
 
     const headers = new HttpHeaders({
       Accept: 'application/json, text/event-stream',
@@ -182,20 +179,17 @@ export class OpenAIService {
 
   // Get available MCP tools
   getMCPTools(): Observable<any> {
-    console.log('Fetching MCP tools from server');
     return this.callMCPMethod('tools/list');
   }
 
   // Call a specific MCP tool
   callMCPTool(toolName: string, params?: any): Observable<any> {
-    console.log('Calling MCP tool:', toolName, 'with params:', params);
     return this.callMCPMethod('tools/call', {
       name: toolName,
       arguments: params || {},
     }).pipe(
-      tap((result) => console.log(`callMCPTool ${toolName} result:`, result)),
       catchError((error) => {
-        console.error(`callMCPTool ${toolName} error:`, error);
+        console.error(`MCP tool ${toolName} error:`, error);
         throw error;
       })
     );
@@ -208,37 +202,25 @@ export class OpenAIService {
 
   // Get all companies with their chats and LLMs
   getCompanies(): Observable<any> {
-    console.log('getCompanies() called, calling MCP tool...');
-    return this.callMCPTool('getCompanies').pipe(
-      tap((result) => console.log('getCompanies MCP result:', result)),
-      catchError((error) => {
-        console.error('getCompanies MCP error:', error);
-        throw error;
-      })
-    );
+    return this.callMCPTool('getCompanies');
   }
 
   // Get chatbots for a specific company
   getChats(companyName: string): Observable<any> {
-    console.log('Fetching chats for company:', companyName);
     return this.callMCPTool('getChats', { companyName });
   }
 
   // Get LLM models for a specific company
   getLLMs(companyName: string): Observable<any> {
-    console.log('Fetching LLMs for company:', companyName);
     return this.callMCPTool('getLLMs', { companyName });
   }
 
   // Enhanced message sending that can utilize MCP server context
   sendMessageWithMCPContext(messages: OpenAIMessage[], mcpTools?: any): Observable<string> {
-    console.log('sendMessageWithMCPContext called, attempting to get companies data...');
     // First try to get actual company data for rich context
     return this.getCompanies().pipe(
       map((companies: any[]): OpenAIMessage[] => {
-        console.log('getCompanies SUCCESS - received data:', companies);
         const context = this.createContext(companies);
-        console.log('Created context:', context);
         const systemPrompt = `You are an AI assistant that helps users find information about AI companies and their products.
 
 You have access to the following data about AI companies:
@@ -261,7 +243,6 @@ Be helpful, accurate, and suggest relevant companies or products based on the us
         return enhancedMessages;
       }),
       catchError((error): Observable<OpenAIMessage[]> => {
-        console.error('getCompanies FAILED - error details:', error);
         console.warn('Could not fetch company data, falling back to basic tool description:', error);
         // Fallback to basic tool description if company data fetch fails
         if (mcpTools && mcpTools.tools && mcpTools.tools.length > 0) {
@@ -285,8 +266,6 @@ Be helpful, accurate, and suggest relevant companies or products based on the us
 
   // Create context from company data (similar to React version)
   private createContext(companies: any): string {
-    console.log('createContext received:', companies);
-    
     // Handle different response formats from MCP
     let companiesArray: any[] = [];
     
@@ -322,8 +301,6 @@ Be helpful, accurate, and suggest relevant companies or products based on the us
       // If it's a single company object, wrap it in an array
       companiesArray = [companies];
     }
-    
-    console.log('Processed companies array:', companiesArray);
     
     if (!companiesArray || companiesArray.length === 0) {
       return 'No company data available.';
