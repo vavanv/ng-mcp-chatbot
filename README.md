@@ -10,6 +10,7 @@ A modern Angular application that integrates with Model Context Protocol (MCP) s
 - **Server-Sent Events**: Handles SSE responses from MCP servers
 - **Proxy Configuration**: Secure CORS-free communication with external MCP servers
 - **API Key Management**: Configurable OpenAI API key storage
+- **Clean Codebase**: Optimized code with minimal debugging overhead and efficient error handling
 
 ## Architecture
 
@@ -110,6 +111,23 @@ The application automatically:
 - Displays connection status in the interface
 - Shows MCP server information when connected
 
+## Recent Improvements
+
+### Code Cleanup (Latest)
+
+- **Reduced Debug Output**: Removed excessive console logging while preserving essential error handling
+- **Import Optimization**: Cleaned up unused RxJS operators and imports
+- **Method Simplification**: Streamlined MCP service methods for better maintainability
+- **Performance Enhancement**: Reduced console output overhead in production builds
+- **Error Handling**: Maintained critical error logging while removing redundant debug statements
+
+### Enhanced MCP Integration
+
+- **Robust Data Parsing**: Improved handling of various MCP response formats
+- **Context Creation**: Enhanced company data processing for AI responses
+- **Tool Discovery**: Automatic MCP tool detection and initialization
+- **Health Monitoring**: Real-time MCP server status tracking
+
 ## Development
 
 ### Project Structure
@@ -169,10 +187,11 @@ ng build --prod
 
 ### Debug Mode
 
-Enable detailed logging by opening browser developer tools and checking the console for:
-- MCP initialization messages
-- Tool execution logs
-- API request/response details
+The application now features optimized logging for better development experience:
+- **Essential Error Logging**: Critical errors and warnings are preserved
+- **Reduced Console Noise**: Excessive debug statements have been removed
+- **Focused Debugging**: Check browser console for important MCP connection issues and API errors
+- **Clean Output**: Streamlined logging for easier troubleshooting
 
 ## Contributing
 
