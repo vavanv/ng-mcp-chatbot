@@ -1,0 +1,16 @@
+{
+  "/api/mcp": {
+    "target": "https://mcp.bmcom.ca",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "ws": false,
+    "pathRewrite": {
+      "^/api/mcp": "/mcp"
+    },
+    "headers": {
+      "Accept": "application/json, text/event-stream",
+      "Content-Type": "application/json"
+    }
+  }
+}
