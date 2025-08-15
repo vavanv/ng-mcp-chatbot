@@ -1,4 +1,5 @@
 import { Component, signal, ElementRef, ViewChild, AfterViewChecked, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { OpenAIService, OpenAIMessage } from './openai.service';
 import { ApiKeyConfigComponent } from './api-key-config.component';
@@ -12,7 +13,7 @@ interface Message {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ApiKeyConfigComponent],
+  imports: [CommonModule, RouterOutlet, ApiKeyConfigComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -42,6 +43,15 @@ export class App implements AfterViewChecked, OnInit {
   mcpHealthStatus = signal<string>('Unknown');
   private shouldScrollToBottom = false;
   private conversationHistory: OpenAIMessage[] = [];
+  
+  // Suggested questions for users
+  suggestedQuestions = [
+    "What AI companies are available?",
+    "Tell me about OpenAI's products",
+    "Which companies offer chatbots?",
+    "What LLM models does Google have?",
+    "Compare Anthropic and OpenAI"
+  ];
   
   ngOnInit() {
     // Always check MCP health on startup to show current status
@@ -283,5 +293,27 @@ export class App implements AfterViewChecked, OnInit {
     ]);
     this.conversationHistory = [];
     this.shouldScrollToBottom = true;
+  }
+  
+  // Handle clicking on suggested questions
+  onSuggestedQuestionClick(question: string) {
+    // Set the question in the input field
+    if (this.messageInput) {
+      this.messageInput.nativeElement.value = question;
+      this.adjustTextareaHeight({ target: this.messageInput.nativeElement });
+    }
+    
+    // Automatically send the message
+    this.sendMessage();
+  }
+
+  // TrackBy function for messages
+  trackByTimestamp(index: number, message: Message): Date {
+    return message.timestamp;
+  }
+
+  // Check if there are any user messages
+  hasUserMessages(): boolean {
+    return this.messages().some(message => message.isUser);
   }
 }

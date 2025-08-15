@@ -261,6 +261,50 @@
   .typing-dot:nth-child(1) { animation-delay: -0.32s; }
   .typing-dot:nth-child(2) { animation-delay: -0.16s; }
 
+  .suggested-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 0 1rem;
+  }
+
+  .suggested-questions h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+  }
+
+  .questions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .question-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    box-shadow: var(--shadow);
+  }
+
+  .question-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -286,6 +330,16 @@
 
     .message {
       max-width: 85%;
+    }
+
+    .suggested-questions {
+      padding: 0 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .question-btn {
+      padding: 0.625rem 0.875rem;
+      font-size: 0.8rem;
     }
   }
 </style>
@@ -339,15 +393,30 @@
       <p>Start a conversation by typing a message below. I'm here to help!</p>
     </div>
 
-    <!-- Dynamic messages -->
-    @for (message of messages(); track message.timestamp) {
-      <div class="message" [class.user]="message.isUser" [class.bot]="!message.isUser">
-        <div class="message-avatar">{{ message.isUser ? 'You' : 'AI' }}</div>
-        <div class="message-content">
-          {{ message.content }}
-        </div>
+    <!-- Suggested Questions - Always Visible -->
+    <div class="suggested-questions">
+      <h3>💡 Try asking:</h3>
+      <div class="questions-grid">
+        <button 
+          class="question-btn" 
+          *ngFor="let question of suggestedQuestions"
+          (click)="onSuggestedQuestionClick(question)"
+          type="button">
+          {{ question }}
+        </button>
       </div>
-    }
+    </div>
+
+    <!-- Dynamic messages -->
+    <div class="message" 
+         *ngFor="let message of messages(); trackBy: trackByTimestamp"
+         [class.user]="message.isUser" 
+         [class.bot]="!message.isUser">
+      <div class="message-avatar">{{ message.isUser ? 'You' : 'AI' }}</div>
+      <div class="message-content">
+        {{ message.content }}
+      </div>
+    </div>
   </div>
 
   <!-- Input Area -->
